@@ -38,6 +38,8 @@ static GLuint tex_fill02;
 unsigned char* image_fill02 = NULL;
 static GLuint tex_key;
 unsigned char* image_key = NULL;
+static GLuint tex_check;
+unsigned char* image_check = NULL;
 
 int iheight, iwidth;
 
@@ -46,9 +48,19 @@ GLfloat fill01_ambient;
 GLfloat fill02_ambient;
 GLfloat key_ambient;
 
+GLfloat mix;
+
 GLfloat fill01_r;
 GLfloat fill01_g;
 GLfloat fill01_b;
+
+GLfloat fill02_r;
+GLfloat fill02_g;
+GLfloat fill02_b;
+
+GLfloat key_r;
+GLfloat key_g;
+GLfloat key_b;
 
 void ejesCoordenada() {
 	
@@ -162,6 +174,17 @@ void init(){
    image_key = glmReadPPM("baked_keyrabbit.ppm", &iwidth, &iheight);
    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, iwidth, iheight, 0, GL_RGB, GL_UNSIGNED_BYTE, image_key);
 
+   glGenTextures(1, &tex_check);
+   glBindTexture(GL_TEXTURE_2D, tex_check);
+
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+   image_check = glmReadPPM("baked_checker.ppm", &iwidth, &iheight);
+   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, iwidth, iheight, 0, GL_RGB, GL_UNSIGNED_BYTE, image_check);
+
    shader = SM.loadfromFile("texture.vert","texture.frag"); // load (and compile, link) from file
   		  if (shader==0) 
 			  std::cout << "Error Loading, compiling or linking shader\n";
@@ -173,6 +196,13 @@ void init(){
 	fill01_r = 0.5;
 	fill01_g = 0.5;
 	fill01_b = 0.5;
+	fill02_r = 0.5;
+	fill02_g = 0.5;
+	fill02_b = 0.5;
+	key_r = 0.5;
+	key_g = 0.5;
+	key_b = 0.5;
+	mix = 0;
 }
 
 
@@ -224,6 +254,45 @@ void Keyboard(unsigned char key, int x, int y)
 		break;
 	case 'i':
 		if (fill01_b >= 0.04) fill01_b -= 0.05;
+		break;
+	case 'd':
+		fill02_r += 0.05;
+		break;
+	case 'f':
+		fill02_g += 0.05;
+		break;
+	case 'g':
+		fill02_b += 0.05;
+		break;
+	case 'h':
+		if (fill02_r >= 0.04) fill02_r -= 0.05;
+		break;
+	case 'j':
+		if (fill02_g >= 0.04) fill02_g -= 0.05;
+		break;
+	case 'k':
+		if (fill02_b >= 0.04) fill02_b -= 0.05;
+		break;
+	case 'c':
+		key_r += 0.05;
+		break;
+	case 'v':
+		key_g += 0.05;
+		break;
+	case 'b':
+		key_b += 0.05;
+		break;
+	case 'n':
+		if (key_r >= 0.04) key_r -= 0.05;
+		break;
+	case 'm':
+		if (key_g >= 0.04) key_g -= 0.05;
+		break;
+	case ',':
+		if (key_b >= 0.04) key_b -= 0.05;
+		break;
+	case '3':
+		mix = 0.2;
 		break;
 	default:
 		break;
@@ -312,6 +381,7 @@ void render(){
 	shader->setTexture("tex_fill01", tex_fill01,1);
 	shader->setTexture("tex_fill02", tex_fill02,2);
 	shader->setTexture("tex_key", tex_key,3);
+	shader->setTexture("tex_check", tex_check,4);
 
 	shader->setUniform1f("_flat_ambient" , flat_ambient);
 	shader->setUniform1f("_fill01_ambient" , fill01_ambient);
@@ -320,6 +390,13 @@ void render(){
 	shader->setUniform1f("_fill01_r" , fill01_r);
 	shader->setUniform1f("_fill01_g" , fill01_g);
 	shader->setUniform1f("_fill01_b" , fill01_b);
+	shader->setUniform1f("_fill02_r" , fill02_r);
+	shader->setUniform1f("_fill02_g" , fill02_g);
+	shader->setUniform1f("_fill02_b" , fill02_b);
+	shader->setUniform1f("_key_r" , key_r);
+	shader->setUniform1f("_key_g" , key_g);
+	shader->setUniform1f("_key_b" , key_b);
+	shader->setUniform1f("_mix" , mix);
 	
 	
 
