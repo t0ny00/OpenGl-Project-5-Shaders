@@ -32,9 +32,23 @@ cwc::glShader *shader;
 //Textures
 static GLuint texflat;
 unsigned char* imageflat = NULL;
+static GLuint tex_fill01;
+unsigned char* image_fill01 = NULL;
+static GLuint tex_fill02;
+unsigned char* image_fill02 = NULL;
+static GLuint tex_key;
+unsigned char* image_key = NULL;
 
 int iheight, iwidth;
 
+GLfloat flat_ambient;
+GLfloat fill01_ambient;
+GLfloat fill02_ambient;
+GLfloat key_ambient;
+
+GLfloat fill01_r;
+GLfloat fill01_g;
+GLfloat fill01_b;
 
 void ejesCoordenada() {
 	
@@ -105,6 +119,7 @@ void init(){
    // Cargando Textura
    glGenTextures(1, &texflat);
    glBindTexture(GL_TEXTURE_2D, texflat);
+ 
 
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -114,10 +129,50 @@ void init(){
    imageflat = glmReadPPM("baked_flat.ppm", &iwidth, &iheight);
    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, iwidth, iheight, 0, GL_RGB, GL_UNSIGNED_BYTE, imageflat);
 
+   glGenTextures(1, &tex_fill01);
+   glBindTexture(GL_TEXTURE_2D, tex_fill01);
+
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+   image_fill01 = glmReadPPM("baked_fill01.ppm", &iwidth, &iheight);
+   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, iwidth, iheight, 0, GL_RGB, GL_UNSIGNED_BYTE, image_fill01);
+
+   glGenTextures(1, &tex_fill02);
+   glBindTexture(GL_TEXTURE_2D, tex_fill02);
+
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+   image_fill02 = glmReadPPM("baked_fill02.ppm", &iwidth, &iheight);
+   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, iwidth, iheight, 0, GL_RGB, GL_UNSIGNED_BYTE, image_fill02);
+
+   glGenTextures(1, &tex_key);
+   glBindTexture(GL_TEXTURE_2D, tex_key);
+
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+   image_key = glmReadPPM("baked_keyrabbit.ppm", &iwidth, &iheight);
+   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, iwidth, iheight, 0, GL_RGB, GL_UNSIGNED_BYTE, image_key);
 
    shader = SM.loadfromFile("texture.vert","texture.frag"); // load (and compile, link) from file
   		  if (shader==0) 
 			  std::cout << "Error Loading, compiling or linking shader\n";
+   
+	flat_ambient = 0;
+	fill01_ambient = 0;
+	fill02_ambient = 0;
+	key_ambient = 0;
+	fill01_r = 0.5;
+	fill01_g = 0.5;
+	fill01_b = 0.5;
 }
 
 
@@ -128,10 +183,52 @@ void Keyboard(unsigned char key, int x, int y)
 
   switch (key)
   {
+	case '1':
+		flat_ambient += 0.05;
+		break;
+	case '2':
+		if (flat_ambient >= 0.04) flat_ambient -= 0.05;
+		break;
+	case 'q':
+		fill01_ambient += 0.05;
+		break;
+	case 'w':
+		if (fill01_ambient >= 0.04) fill01_ambient -= 0.05;
+		break;
+	case 'a':
+		fill02_ambient += 0.05;
+		break;
+	case 's':
+		if (fill02_ambient >= 0.04) fill02_ambient -= 0.05;
+		break;
+	case 'z':
+		key_ambient += 0.05;
+		break;
+	case 'x':
+		if (key_ambient >= 0.04) key_ambient -= 0.05;
+		break;
+	case 'e':
+		fill01_r += 0.05;
+		break;
+	case 'r':
+		fill01_g += 0.05;
+		break;
+	case 't':
+		fill01_b += 0.05;
+		break;
+	case 'y':
+		if (fill01_r >= 0.04) fill01_r -= 0.05;
+		break;
+	case 'u':
+		if (fill01_g >= 0.04) fill01_g -= 0.05;
+		break;
+	case 'i':
+		if (fill01_b >= 0.04) fill01_b -= 0.05;
+		break;
 	default:
 		break;
   }
-
+  
   glutPostRedisplay();
 }
 
@@ -212,8 +309,19 @@ void render(){
 
 	
 	shader->setTexture("stexflat", texflat,0);
+	shader->setTexture("tex_fill01", tex_fill01,1);
+	shader->setTexture("tex_fill02", tex_fill02,2);
+	shader->setTexture("tex_key", tex_key,3);
 
-
+	shader->setUniform1f("_flat_ambient" , flat_ambient);
+	shader->setUniform1f("_fill01_ambient" , fill01_ambient);
+	shader->setUniform1f("_fill02_ambient" , fill02_ambient);
+	shader->setUniform1f("_key_ambient" , key_ambient);
+	shader->setUniform1f("_fill01_r" , fill01_r);
+	shader->setUniform1f("_fill01_g" , fill01_g);
+	shader->setUniform1f("_fill01_b" , fill01_b);
+	
+	
 
 	// Codigo para el mesh	
 	glEnable(GL_NORMALIZE);
