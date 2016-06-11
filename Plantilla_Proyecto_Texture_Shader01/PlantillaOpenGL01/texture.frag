@@ -18,6 +18,9 @@ uniform float _key_r;
 uniform float _key_g;
 uniform float _key_b;
 uniform float _mix;
+uniform float _mixColor_r;
+uniform float _mixColor_g;
+uniform float _mixColor_b;
 
 void main(void) {
 
@@ -33,7 +36,8 @@ void main(void) {
 	cKey= vec4(_key_r,_key_g,_key_b,1);
 
 	cFlat = texture2D(stexflat,gl_TexCoord[0].st);
-	cCheck = texture2D(tex_check,gl_TexCoord[0].st);
+	cCheck = texture2D(tex_check,gl_TexCoord[0].st) * vec4(_mixColor_r,_mixColor_g,_mixColor_b,1);
+
 	cFlat = mix(cFlat,cCheck,_mix);
 	cFinal = cFlat * iAmbFlat 
 			+ texture2D(tex_fill01,gl_TexCoord[0].st) * cFlat * cFill01 * iAmbFill01

@@ -49,6 +49,9 @@ GLfloat fill02_ambient;
 GLfloat key_ambient;
 
 GLfloat mix;
+GLfloat mixColor_r;
+GLfloat mixColor_g;
+GLfloat mixColor_b;
 
 GLfloat fill01_r;
 GLfloat fill01_g;
@@ -203,6 +206,10 @@ void init(){
 	key_g = 0.5;
 	key_b = 0.5;
 	mix = 0;
+	mixColor_r = 1;
+	mixColor_g = 1;
+	mixColor_b = 1;
+
 }
 
 
@@ -292,7 +299,28 @@ void Keyboard(unsigned char key, int x, int y)
 		if (key_b >= 0.04) key_b -= 0.05;
 		break;
 	case '3':
-		mix = 0.2;
+		mix = 0.3;
+		mixColor_r = 5;
+		mixColor_g = 0;
+		mixColor_b = 0;
+		break;
+	case '4':
+		mix = 0.3;
+		mixColor_r = 0;
+		mixColor_g = 5;
+		mixColor_b = 0;
+		break;
+	case '5':
+		mix = 0.3;
+		mixColor_r = 0;
+		mixColor_g = 0;
+		mixColor_b = 5;
+		break;
+	case '6':
+		mix = 0.3;
+		mixColor_r = 5;
+		mixColor_g = 0;
+		mixColor_b = 5;
 		break;
 	default:
 		break;
@@ -397,6 +425,9 @@ void render(){
 	shader->setUniform1f("_key_g" , key_g);
 	shader->setUniform1f("_key_b" , key_b);
 	shader->setUniform1f("_mix" , mix);
+	shader->setUniform1f("_mixColor_r" , mixColor_r);
+	shader->setUniform1f("_mixColor_g" , mixColor_g);
+	shader->setUniform1f("_mixColor_b" , mixColor_b);
 	
 	
 
