@@ -62,6 +62,8 @@ GLfloat key_r;
 GLfloat key_g;
 GLfloat key_b;
 
+GLfloat bilinearFilterEnabled = 0.0;
+
 void ejesCoordenada() {
 	
 	glDisable(GL_LIGHTING);	
@@ -131,8 +133,10 @@ void init(){
    // Cargando Textura
    glGenTextures(1, &texflat);
    glBindTexture(GL_TEXTURE_2D, texflat);
- 
-
+  
+   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+   
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -294,6 +298,12 @@ void Keyboard(unsigned char key, int x, int y)
 	case '3':
 		mix = 0.2;
 		break;
+	case 'o':
+		bilinearFilterEnabled = 1.0;
+		break;
+	case 'p':
+		bilinearFilterEnabled = 0.0;
+		break;
 	default:
 		break;
   }
@@ -397,6 +407,9 @@ void render(){
 	shader->setUniform1f("_key_g" , key_g);
 	shader->setUniform1f("_key_b" , key_b);
 	shader->setUniform1f("_mix" , mix);
+
+	shader->setUniform1f("_bilinearFilterEnabled" , bilinearFilterEnabled);
+
 	
 	
 
