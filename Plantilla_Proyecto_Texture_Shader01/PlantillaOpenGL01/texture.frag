@@ -56,8 +56,13 @@ void main(void) {
 	cFill02 = vec4(_fill02_r,_fill02_g,_fill02_b,1);
 	cKey= vec4(_key_r,_key_g,_key_b,1);
 
-	cFlat = texture2D(stexflat,gl_TexCoord[0].st);
-	cCheck = texture2D(tex_check,gl_TexCoord[0].st);
+	if(_bilinearFilterEnabled == 1.0){
+		cFlat = texture2D_bilinear(stexflat,gl_TexCoord[0].st);
+		cCheck = texture2D_bilinear(tex_check,gl_TexCoord[0].st);
+	} else {
+		cFlat = texture2D(stexflat,gl_TexCoord[0].st);
+		cCheck = texture2D(tex_check,gl_TexCoord[0].st);
+	}
 	cFlat = mix(cFlat,cCheck,_mix);
 
 	if(_bilinearFilterEnabled == 1.0){
