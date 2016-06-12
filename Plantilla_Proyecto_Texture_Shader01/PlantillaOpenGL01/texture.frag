@@ -1,5 +1,5 @@
-#define textureWidth 1800.0
-#define textureHeight 3200.0	
+#define textureWidth 2048.0
+#define textureHeight 2048.0	
 #define texel_size_x 1.0 / textureWidth
 #define texel_size_y 1.0 / textureHeight
 
