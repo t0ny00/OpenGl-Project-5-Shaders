@@ -65,6 +65,8 @@ GLfloat key_r;
 GLfloat key_g;
 GLfloat key_b;
 
+GLfloat bilinearFilterEnabled = 0.0;
+
 void ejesCoordenada() {
 	
 	glDisable(GL_LIGHTING);	
@@ -134,8 +136,8 @@ void init(){
    // Cargando Textura
    glGenTextures(1, &texflat);
    glBindTexture(GL_TEXTURE_2D, texflat);
- 
-
+  
+   
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -171,8 +173,12 @@ void init(){
 
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+   /*
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+   */
+   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
    image_key = glmReadPPM("baked_keyrabbit.ppm", &iwidth, &iheight);
    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, iwidth, iheight, 0, GL_RGB, GL_UNSIGNED_BYTE, image_key);
@@ -322,6 +328,12 @@ void Keyboard(unsigned char key, int x, int y)
 		mixColor_g = 0;
 		mixColor_b = 5;
 		break;
+	case 'o':
+		bilinearFilterEnabled = 1.0;
+		break;
+	case 'p':
+		bilinearFilterEnabled = 0.0;
+		break;
 	default:
 		break;
   }
@@ -428,9 +440,9 @@ void render(){
 	shader->setUniform1f("_mixColor_r" , mixColor_r);
 	shader->setUniform1f("_mixColor_g" , mixColor_g);
 	shader->setUniform1f("_mixColor_b" , mixColor_b);
-	
-	
+	shader->setUniform1f("_bilinearFilterEnabled" , bilinearFilterEnabled);
 
+	
 	// Codigo para el mesh	
 	glEnable(GL_NORMALIZE);
 	glTranslatef(0.0, -2.0, 0.0);
